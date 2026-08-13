@@ -7,7 +7,7 @@
 # On DSMLP after pushing to GHCR:
 #   launch.sh -i ghcr.io/<github-user>/dsmlp-desktop:main -P Always -c 4 -m 16
 
-ARG BASE_CONTAINER=ghcr.io/ucsd-ets/datascience-notebook:stable
+ARG BASE_CONTAINER=ghcr.io/ucsd-ets/scipy-notebook:stable
 FROM $BASE_CONTAINER
 
 LABEL maintainer="jawootton"
