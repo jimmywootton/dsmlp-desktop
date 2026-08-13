@@ -39,6 +39,17 @@ RUN apt-get update -qq \
  && mkdir -p /opt/install \
  && chown -R ${NB_UID}:${NB_GID} /opt/install
 
+# GPU pods bind-mount NVIDIA GL/EGL ICDs. Xtigervnc then segfaults during
+# GLX init (libnvidia-egl-gbm + Mesa swrast). Force Mesa software GL for the
+# virtual desktop; CUDA/PyTorch still use the NVIDIA GPU.
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility \
+    LIBGL_ALWAYS_SOFTWARE=1 \
+    __GLX_VENDOR_LIBRARY_NAME=mesa \
+    __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json \
+    __EGL_EXTERNAL_PLATFORM_CONFIG_DIRS=/etc/dsmlp-desktop/no-egl-external
+
+RUN mkdir -p /etc/dsmlp-desktop/no-egl-external
+
 # notebook user (jovyan at build time; DSMLP remaps to your campus user at runtime)
 USER ${NB_USER}
 
