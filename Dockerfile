@@ -4,14 +4,18 @@
 # Build locally (optional):
 #   docker build -t dsmlp-desktop .
 #
-# On DSMLP after pushing to GHCR:
-#   launch.sh -i ghcr.io/<github-user>/dsmlp-desktop:main -P Always -c 4 -m 16
+# On DSMLP after pushing to GHCR (RTX 6000 / b24gb):
+#   launch.sh -i ghcr.io/<github-user>/dsmlp-desktop:main -P Always \
+#     -g 1 -v b24gb -c 8 -m 32
+#
+# scipy-ml includes CUDA/PyTorch/TF so DSMLP GPUs (including b24gb) are usable.
+# Request the GPU at launch with -g 1; DSMLP injects the NVIDIA driver.
 
-ARG BASE_CONTAINER=ghcr.io/ucsd-ets/datascience-notebook:stable
+ARG BASE_CONTAINER=ghcr.io/ucsd-ets/scipy-ml-notebook:stable
 FROM $BASE_CONTAINER
 
 LABEL maintainer="jawootton"
-LABEL description="XFCE desktop + TigerVNC via jupyter-remote-desktop-proxy"
+LABEL description="XFCE desktop + TigerVNC + CUDA/ML stack for DSMLP GPUs"
 
 USER root
 
