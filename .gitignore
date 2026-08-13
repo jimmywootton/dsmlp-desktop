@@ -1,0 +1,6 @@
+*
+!Dockerfile
+!.github/
+!.github/workflows/
+!.github/workflows/docker.yml
+!.gitignore
