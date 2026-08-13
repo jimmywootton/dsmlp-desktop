@@ -1,25 +1,25 @@
-# GUI desktop for DSMLP / DataHub
-# Browser access via Jupyter path: /desktop  (jupyter-remote-desktop-proxy)
+# GUI desktop for DSMLP / DataHub (CSE 151B CUDA 12.8 stack)
+# Browser access via Jupyter path: /desktop (jupyter-remote-desktop-proxy)
+#
+# Base: ghcr.io/ucsd-ets/sp26-cuda128:main (PyTorch 2.11 + cu128)
 #
 # Build locally (optional):
 #   docker build -t dsmlp-desktop .
 #
-# On DSMLP after pushing to GHCR (RTX 6000 / b24gb):
-#   launch.sh -i ghcr.io/<github-user>/dsmlp-desktop:main -P Always \
-#     -g 1 -v b24gb -c 8 -m 32
-#
-# scipy-ml includes CUDA/PyTorch/TF so DSMLP GPUs (including b24gb) are usable.
-# Request the GPU at launch with -g 1; DSMLP injects the NVIDIA driver.
+# On DSMLP after pushing to GHCR:
+#   launch.sh -i ghcr.io/jimmywootton/dsmlp-desktop:main -P Always \
+#     -W CSE151B_SP26_A00 -l gpu-class=medium -g 1 -c 8 -m 64
 
-ARG BASE_CONTAINER=ghcr.io/ucsd-ets/scipy-ml-notebook:stable
+ARG BASE_CONTAINER=ghcr.io/ucsd-ets/sp26-cuda128:main
 FROM $BASE_CONTAINER
 
 LABEL maintainer="jawootton"
-LABEL description="XFCE desktop + TigerVNC + CUDA/ML stack for DSMLP GPUs"
+LABEL description="XFCE desktop + TigerVNC on sp26-cuda128 (CUDA 12.8)"
 
 USER root
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NOWARNINGS="yes"
 
 RUN apt-get update -qq \
  && apt-get install -y -qq --no-install-recommends \
@@ -33,7 +33,7 @@ RUN apt-get update -qq \
       fonts-dejavu \
       tigervnc-standalone-server \
       xclip \
- && apt-get remove -y -qq xfce4-screensaver || true \
+ && apt-get remove -y -qq xfce4-screensaver light-locker || true \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/* \
  && mkdir -p /opt/install \
@@ -53,4 +53,4 @@ RUN mkdir -p /etc/dsmlp-desktop/no-egl-external
 # notebook user (jovyan at build time; DSMLP remaps to your campus user at runtime)
 USER ${NB_USER}
 
-RUN pip install --no-cache-dir jupyter-remote-desktop-proxy
+RUN uv pip install --system jupyter-remote-desktop-proxy
